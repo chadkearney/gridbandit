@@ -1,0 +1,3 @@
+redisConfiguration:
+  campaignSummaryRedisHost: localhost
+  campaignSummaryRedisPort: 6379
