@@ -26,7 +26,7 @@ public class CassandraCampaignDao implements CampaignDao {
 	}
 
 	@Override
-	public void ensureExists(String campaignName) {
+	public void ensureExistence(String campaignName) {
 		Insert insert = QueryBuilder
 				.insertInto("gridbandit", "campaigns")
 				.value("name", campaignName)
@@ -45,6 +45,32 @@ public class CassandraCampaignDao implements CampaignDao {
 
 		Campaign campaign = campaignOptional.get();
 		campaign.setScoringFormula(scoringFormula);
+		campaign.setLastPotentiallyScoreAlteringMutationMse(System.currentTimeMillis());
+		campaignMapper.save(campaign);
+	}
+
+	@Override
+	public void ensureTemplatePresence(String campaignName, String templateId) {
+		Optional<Campaign> campaignOptional = tryGetCampaign(campaignName);
+		if (!campaignOptional.isPresent()) {
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+
+		Campaign campaign = campaignOptional.get();
+		campaign.getActiveTemplateIds().add(templateId);
+		campaign.setLastPotentiallyScoreAlteringMutationMse(System.currentTimeMillis());
+		campaignMapper.save(campaign);
+	}
+
+	@Override
+	public void ensureTemplateAbsence(String campaignName, String templateId) {
+		Optional<Campaign> campaignOptional = tryGetCampaign(campaignName);
+		if (!campaignOptional.isPresent()) {
+			throw new WebApplicationException(Response.Status.NOT_FOUND);
+		}
+
+		Campaign campaign = campaignOptional.get();
+		campaign.getActiveTemplateIds().remove(templateId);
 		campaign.setLastPotentiallyScoreAlteringMutationMse(System.currentTimeMillis());
 		campaignMapper.save(campaign);
 	}

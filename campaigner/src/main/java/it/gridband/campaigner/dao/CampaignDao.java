@@ -5,6 +5,8 @@ import it.gridband.campaigner.model.Campaign;
 
 public interface CampaignDao {
 	Optional<Campaign> tryGetCampaign(String campaignName);
-	void ensureExists(String campaignName);
+	void ensureExistence(String campaignName);
 	void setScoringFormula(String campaignName, String scoringFormula);
+	void ensureTemplatePresence(String campaignName, String templateId);
+	void ensureTemplateAbsence(String campaignName, String templateId);
 }

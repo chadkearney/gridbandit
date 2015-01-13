@@ -15,7 +15,7 @@ import it.gridband.campaigner.management.CassandraClusterManaged;
 import it.gridband.campaigner.management.CassandraSessionManaged;
 import it.gridband.campaigner.model.Campaign;
 import it.gridband.campaigner.resources.CampaignResource;
-import it.gridband.campaigner.resources.CandidateResource;
+import it.gridband.campaigner.resources.TemplateResource;
 import it.gridband.campaigner.resources.MessageResource;
 
 public class CampaignerApplication extends Application<CampaignerConfiguration> {
@@ -48,8 +48,8 @@ public class CampaignerApplication extends Application<CampaignerConfiguration> 
 		final CampaignResource campaignResource = new CampaignResource(campaignDao);
 		environment.jersey().register(campaignResource);
 
-		final CandidateResource candidateResource = new CandidateResource();
-		environment.jersey().register(candidateResource);
+		final TemplateResource templateResource = new TemplateResource(campaignDao);
+		environment.jersey().register(templateResource);
 
 		final MessageResource messageResource = new MessageResource();
 		environment.jersey().register(messageResource);

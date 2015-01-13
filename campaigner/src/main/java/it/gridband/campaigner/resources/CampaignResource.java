@@ -32,7 +32,7 @@ public class CampaignResource {
 	@Path("{campaignName}")
 	// Example: curl -X PUT http://localhost:8080/campaigns/xmas-campaign
 	public void ensureExists(@PathParam("campaignName") String campaignName) {
-		campaignDao.ensureExists(campaignName);
+		campaignDao.ensureExistence(campaignName);
 	}
 
 	@PUT
