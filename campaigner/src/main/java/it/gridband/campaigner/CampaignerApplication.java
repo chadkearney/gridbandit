@@ -1,13 +1,22 @@
 package it.gridband.campaigner;
 
-import it.gridband.campaigner.config.CampaignerConfiguration;
-import it.gridband.campaigner.health.AliveHealthCheck;
-import it.gridband.campaigner.resources.CampaignResource;
-import it.gridband.campaigner.resources.CandidateResource;
-import it.gridband.campaigner.resources.MessageResource;
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.mapping.MappingManager;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import it.gridband.campaigner.config.CampaignerConfiguration;
+import it.gridband.campaigner.config.CassandraConfiguration;
+import it.gridband.campaigner.dao.CampaignDao;
+import it.gridband.campaigner.dao.CassandraCampaignDao;
+import it.gridband.campaigner.health.AliveHealthCheck;
+import it.gridband.campaigner.management.CassandraClusterManaged;
+import it.gridband.campaigner.management.CassandraSessionManaged;
+import it.gridband.campaigner.model.Campaign;
+import it.gridband.campaigner.resources.CampaignResource;
+import it.gridband.campaigner.resources.CandidateResource;
+import it.gridband.campaigner.resources.MessageResource;
 
 public class CampaignerApplication extends Application<CampaignerConfiguration> {
 
@@ -30,7 +39,13 @@ public class CampaignerApplication extends Application<CampaignerConfiguration> 
 		final AliveHealthCheck aliveHealthCheck = new AliveHealthCheck();
 		environment.healthChecks().register("alive", aliveHealthCheck);
 
-		final CampaignResource campaignResource = new CampaignResource();
+		Cluster cluster = createManagedCassandraCluster(configuration.getCassandraConfiguration(), environment);
+		Session session = createManagedCassandraSession(cluster, environment);
+
+		MappingManager mappingManager = new MappingManager(session);
+		final CampaignDao campaignDao = new CassandraCampaignDao(session, mappingManager.mapper(Campaign.class));
+
+		final CampaignResource campaignResource = new CampaignResource(campaignDao);
 		environment.jersey().register(campaignResource);
 
 		final CandidateResource candidateResource = new CandidateResource();
@@ -39,6 +54,26 @@ public class CampaignerApplication extends Application<CampaignerConfiguration> 
 		final MessageResource messageResource = new MessageResource();
 		environment.jersey().register(messageResource);
 
+	}
+
+	private Cluster createManagedCassandraCluster(CassandraConfiguration configuration, Environment environment)
+	{
+		Cluster cluster = Cluster.builder().addContactPoint(configuration.getAddress()).build();
+
+		CassandraClusterManaged cassandraClusterManaged = new CassandraClusterManaged(cluster);
+		environment.lifecycle().manage(cassandraClusterManaged);
+
+		return cluster;
+	}
+
+	private Session createManagedCassandraSession(Cluster cluster, Environment environment)
+	{
+		Session session = cluster.connect();
+
+		CassandraSessionManaged cassandraSessionManaged = new CassandraSessionManaged(session);
+		environment.lifecycle().manage(cassandraSessionManaged);
+
+		return session;
 	}
 
 }

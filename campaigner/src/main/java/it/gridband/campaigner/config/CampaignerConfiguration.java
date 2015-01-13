@@ -7,14 +7,14 @@ import javax.validation.Valid;
 public class CampaignerConfiguration extends Configuration {
 
 	@Valid
-	private RedisConfiguration redisConfiguration;
+	private CassandraConfiguration cassandraConfiguration;
 
-	public RedisConfiguration getRedisConfiguration() {
-		return redisConfiguration;
+	public CassandraConfiguration getCassandraConfiguration() {
+		return cassandraConfiguration;
 	}
 
-	public void setRedisConfiguration(RedisConfiguration redisConfiguration) {
-		this.redisConfiguration = redisConfiguration;
+	public void setCassandraConfiguration(CassandraConfiguration cassandraConfiguration) {
+		this.cassandraConfiguration = cassandraConfiguration;
 	}
 
 }

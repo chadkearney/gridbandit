@@ -1,3 +1,2 @@
-redisConfiguration:
-  campaignSummaryRedisHost: localhost
-  campaignSummaryRedisPort: 6379
+cassandraConfiguration:
+  address: localhost
