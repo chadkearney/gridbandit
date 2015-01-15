@@ -26,11 +26,11 @@ public class Campaign {
 	@Column(name = "active_template_ids")
 	private Set<String> activeTemplateIds;
 
-	@Column(name = "last_potentially_score_altering_mutation_mse")
-	private long lastPotentiallyScoreAlteringMutationMse;
+	@Column(name = "last_potentially_score_altering_change_mse")
+	private Long lastPotentiallyScoreAlteringChangeMse;
 
 	@NotNull
-	@Length(max = 256)
+	@Length(max = 1024)
 	@Column(name = "scoring_formula")
 	private String scoringFormula;
 
@@ -43,11 +43,6 @@ public class Campaign {
 	@Column(name = "template_probabilities_update_last_activity_mse")
 	private Long templateProbabilitiesUpdateLastActivityMse;
 
-	public Campaign() {
-		activeTemplateIds = new HashSet<String>();
-		templateProbabilities = new HashMap<String, Double>();
-		lastPotentiallyScoreAlteringMutationMse = System.currentTimeMillis();
-	}
 
 	@JsonProperty
 	public String getName() {
@@ -66,11 +61,11 @@ public class Campaign {
 	}
 
 	@JsonIgnore
-	public long getLastPotentiallyScoreAlteringMutationMse() {
-		return lastPotentiallyScoreAlteringMutationMse;
+	public long getLastPotentiallyScoreAlteringChangeMse() {
+		return lastPotentiallyScoreAlteringChangeMse;
 	}
-	public void setLastPotentiallyScoreAlteringMutationMse(long lastPotentiallyScoreAlteringMutationMse) {
-		this.lastPotentiallyScoreAlteringMutationMse = lastPotentiallyScoreAlteringMutationMse;
+	public void setLastPotentiallyScoreAlteringChangeMse(long lastPotentiallyScoreAlteringChangeMse) {
+		this.lastPotentiallyScoreAlteringChangeMse = lastPotentiallyScoreAlteringChangeMse;
 	}
 
 	@JsonProperty
