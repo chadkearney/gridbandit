@@ -9,8 +9,6 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,22 +24,22 @@ public class Campaign {
 	@Column(name = "active_template_ids")
 	private Set<String> activeTemplateIds;
 
-	@Column(name = "last_potentially_score_altering_change_mse")
-	private Long lastPotentiallyScoreAlteringChangeMse;
+	@Column(name = "template_id_to_probability")
+	private Map<String, Double> templateIdToProbability;
 
 	@NotNull
 	@Length(max = 1024)
 	@Column(name = "scoring_formula")
 	private String scoringFormula;
 
-	@Column(name = "template_probabilities")
-	private Map<String, Double> templateProbabilities;
+	@Column(name = "last_potentially_score_altering_change_mse")
+	private Long lastPotentiallyScoreAlteringChangeMse;
 
-	@Column(name = "template_probabilities_last_updated_mse")
-	private Long templateProbabilitiesLastUpdatedMse;
+	@Column(name = "template_probabilities_include_changes_up_to_mse")
+	private Long templateProbabilitiesIncludeChangesUpToMse;
 
-	@Column(name = "template_probabilities_update_last_activity_mse")
-	private Long templateProbabilitiesUpdateLastActivityMse;
+	@Column(name = "template_probabilities_update_heartbeat_mse")
+	private Long templateProbabilitiesUpdateHeartbeatMse;
 
 
 	@JsonProperty
@@ -61,10 +59,10 @@ public class Campaign {
 	}
 
 	@JsonIgnore
-	public long getLastPotentiallyScoreAlteringChangeMse() {
+	public Long getLastPotentiallyScoreAlteringChangeMse() {
 		return lastPotentiallyScoreAlteringChangeMse;
 	}
-	public void setLastPotentiallyScoreAlteringChangeMse(long lastPotentiallyScoreAlteringChangeMse) {
+	public void setLastPotentiallyScoreAlteringChangeMse(Long lastPotentiallyScoreAlteringChangeMse) {
 		this.lastPotentiallyScoreAlteringChangeMse = lastPotentiallyScoreAlteringChangeMse;
 	}
 
@@ -77,26 +75,26 @@ public class Campaign {
 	}
 
 	@JsonProperty
-	public Map<String, Double> getTemplateProbabilities() {
-		return templateProbabilities;
+	public Map<String, Double> getTemplateIdToProbability() {
+		return templateIdToProbability;
 	}
-	public void setTemplateProbabilities(Map<String, Double> templateProbabilities) {
-		this.templateProbabilities = templateProbabilities;
+	public void setTemplateIdToProbability(Map<String, Double> templateIdToProbability) {
+		this.templateIdToProbability = templateIdToProbability;
 	}
 
 	@JsonProperty
-	public Long getTemplateProbabilitiesLastUpdatedMse() {
-		return templateProbabilitiesLastUpdatedMse;
+	public Long getTemplateProbabilitiesIncludeChangesUpToMse() {
+		return templateProbabilitiesIncludeChangesUpToMse;
 	}
-	public void setTemplateProbabilitiesLastUpdatedMse(Long templateProbabilitiesLastUpdatedMse) {
-		this.templateProbabilitiesLastUpdatedMse = templateProbabilitiesLastUpdatedMse;
+	public void setTemplateProbabilitiesIncludeChangesUpToMse(Long templateProbabilitiesIncludeChangesUpToMse) {
+		this.templateProbabilitiesIncludeChangesUpToMse = templateProbabilitiesIncludeChangesUpToMse;
 	}
 
 	@JsonIgnore
-	public Long getTemplateProbabilitiesUpdateLastActivityMse() {
-		return templateProbabilitiesUpdateLastActivityMse;
+	public Long getTemplateProbabilitiesUpdateHeartbeatMse() {
+		return templateProbabilitiesUpdateHeartbeatMse;
 	}
-	public void setTemplateProbabilitiesUpdateLastActivityMse(Long templateProbabilitiesUpdateLastActivityMse) {
-		this.templateProbabilitiesUpdateLastActivityMse = templateProbabilitiesUpdateLastActivityMse;
+	public void setTemplateProbabilitiesUpdateHeartbeatMse(Long templateProbabilitiesUpdateHeartbeatMse) {
+		this.templateProbabilitiesUpdateHeartbeatMse = templateProbabilitiesUpdateHeartbeatMse;
 	}
 }

@@ -6,6 +6,7 @@ import com.datastax.driver.mapping.MappingManager;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import it.gridband.campaigner.batch.ProbabilityUpdater;
 import it.gridband.campaigner.config.CampaignerConfiguration;
 import it.gridband.campaigner.config.CassandraConfiguration;
 import it.gridband.campaigner.dao.CampaignDao;
@@ -19,6 +20,9 @@ import it.gridband.campaigner.model.Campaign;
 import it.gridband.campaigner.resources.CampaignResource;
 import it.gridband.campaigner.resources.TemplateResource;
 import it.gridband.campaigner.resources.WebhookResource;
+
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class CampaignerApplication extends Application<CampaignerConfiguration> {
 
@@ -48,6 +52,8 @@ public class CampaignerApplication extends Application<CampaignerConfiguration> 
 		final CampaignDao campaignDao = new CassandraCampaignDao(session, mappingManager.mapper(Campaign.class));
 
 		final MessageDao messageDao = new CassandraMessageDao(session);
+
+		startProbabilityUpdater(environment, messageDao, campaignDao);
 
 		final CampaignResource campaignResource = new CampaignResource(campaignDao);
 		environment.jersey().register(campaignResource);
@@ -80,4 +86,11 @@ public class CampaignerApplication extends Application<CampaignerConfiguration> 
 		return session;
 	}
 
+	private void startProbabilityUpdater(Environment environment, MessageDao messageDao, CampaignDao campaignDao) {
+		String probabilityUpdaterThreadNameFormat = "probability-updater-%d";
+		ScheduledExecutorService probabilityUpdaterExecutorService =
+				environment.lifecycle().scheduledExecutorService(probabilityUpdaterThreadNameFormat).build();
+		Runnable probabilityUpdater = new ProbabilityUpdater(messageDao, campaignDao);
+		probabilityUpdaterExecutorService.scheduleWithFixedDelay(probabilityUpdater, 0, 15, TimeUnit.SECONDS);
+	}
 }
