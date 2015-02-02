@@ -22,7 +22,6 @@ public class ProbabilityUpdater implements Runnable {
 		this.campaignDao = campaignDao;
 	}
 
-	// TODO: Absorb all exceptions, so that the executor won't die.
 	@Override
 	public void run() {
 		logger.info("ProbabilityUpdater waking up.");
@@ -36,6 +35,7 @@ public class ProbabilityUpdater implements Runnable {
 				long upperBoundChangeTimestamps = System.currentTimeMillis();
 				Map<String, Double> newProbabilities = Maps.newHashMap();
 				for (String activeTemplateId : campaign.getActiveTemplateIds()) {
+					campaignDao.updateHeartbeatToPresent(campaign.getName());
 					newProbabilities.put(activeTemplateId, 1d / campaign.getActiveTemplateIds().size());
 				}
 

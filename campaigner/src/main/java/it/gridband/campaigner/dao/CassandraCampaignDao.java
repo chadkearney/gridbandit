@@ -119,6 +119,15 @@ public class CassandraCampaignDao implements CampaignDao {
 		session.execute(statement);
 	}
 
+	@Override
+	public void updateHeartbeatToPresent(String campaignName) {
+		Statement statement = QueryBuilder
+				.update("gridbandit", "campaigns")
+				.with(set("template_probabilities_update_heartbeat_mse", System.currentTimeMillis()))
+				.where(eq("name", campaignName));
+		session.execute(statement);
+	}
+
 	private boolean heartbeatHasNotBeenUpdatedInLastGivenMillis(Campaign campaign, long givenMillis) {
 		return campaign.getTemplateProbabilitiesUpdateHeartbeatMse() == null ||
 				System.currentTimeMillis() - campaign.getTemplateProbabilitiesUpdateHeartbeatMse() > givenMillis;

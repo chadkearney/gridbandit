@@ -24,4 +24,6 @@ public interface CampaignDao {
 	boolean tryClaimCampaignForTemplateProbabilityUpdate(Campaign campaign);
 
 	void updateTemplateProbabilities(String campaignName, Map<String, Double> templateIdToProbability, long changeUpperBoundMse);
+
+	void updateHeartbeatToPresent(String campaignName);
 }
