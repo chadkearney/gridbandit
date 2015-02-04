@@ -20,6 +20,8 @@ import it.gridband.campaigner.model.Campaign;
 import it.gridband.campaigner.resources.CampaignResource;
 import it.gridband.campaigner.resources.TemplateResource;
 import it.gridband.campaigner.resources.WebhookResource;
+import it.gridband.campaigner.select.HighestProbabilityActiveTemplateIdSelector;
+import it.gridband.campaigner.select.ActiveTemplateIdSelector;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -55,10 +57,12 @@ public class CampaignerApplication extends Application<CampaignerConfiguration> 
 
 		startProbabilityUpdater(environment, messageDao, campaignDao);
 
+		ActiveTemplateIdSelector activeTemplateIdSelector = new HighestProbabilityActiveTemplateIdSelector();
+
 		final CampaignResource campaignResource = new CampaignResource(campaignDao);
 		environment.jersey().register(campaignResource);
 
-		final TemplateResource templateResource = new TemplateResource(campaignDao);
+		final TemplateResource templateResource = new TemplateResource(campaignDao, activeTemplateIdSelector);
 		environment.jersey().register(templateResource);
 
 		final WebhookResource messageResource = new WebhookResource(messageDao, campaignDao);
