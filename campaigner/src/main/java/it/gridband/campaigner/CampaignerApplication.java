@@ -17,11 +17,14 @@ import it.gridband.campaigner.health.AliveHealthCheck;
 import it.gridband.campaigner.management.CassandraClusterManaged;
 import it.gridband.campaigner.management.CassandraSessionManaged;
 import it.gridband.campaigner.model.Campaign;
+import it.gridband.campaigner.probability.ArrayIndexDistributionFactory;
+import it.gridband.campaigner.probability.WeightedArrayIndexDistributionFactoryWithUniformFallback;
 import it.gridband.campaigner.resources.CampaignResource;
 import it.gridband.campaigner.resources.TemplateResource;
 import it.gridband.campaigner.resources.WebhookResource;
-import it.gridband.campaigner.select.HighestProbabilityActiveTemplateIdSelector;
+import it.gridband.campaigner.score.ExistingScoreExtractor;
 import it.gridband.campaigner.select.ActiveTemplateIdSelector;
+import it.gridband.campaigner.select.DistributionBasedActiveTemplateIdSelector;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +60,8 @@ public class CampaignerApplication extends Application<CampaignerConfiguration> 
 
 		startProbabilityUpdater(environment, messageDao, campaignDao);
 
-		ActiveTemplateIdSelector activeTemplateIdSelector = new HighestProbabilityActiveTemplateIdSelector();
+		ArrayIndexDistributionFactory factory = new WeightedArrayIndexDistributionFactoryWithUniformFallback();
+		ActiveTemplateIdSelector activeTemplateIdSelector = new DistributionBasedActiveTemplateIdSelector(factory, new ExistingScoreExtractor());
 
 		final CampaignResource campaignResource = new CampaignResource(campaignDao);
 		environment.jersey().register(campaignResource);
