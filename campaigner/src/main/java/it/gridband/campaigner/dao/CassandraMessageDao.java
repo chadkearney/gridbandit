@@ -3,6 +3,9 @@ package it.gridband.campaigner.dao;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.mapping.Mapper;
+import com.datastax.driver.mapping.Result;
+import it.gridband.campaigner.model.Message;
 import it.gridband.campaigner.model.WebhookEventType;
 
 import static com.datastax.driver.core.querybuilder.QueryBuilder.eq;
@@ -11,9 +14,11 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.put;
 public class CassandraMessageDao implements MessageDao {
 
 	private Session session;
+	private Mapper<Message> messageMapper;
 
-	public CassandraMessageDao(Session session) {
+	public CassandraMessageDao(Session session, Mapper<Message> messageMapper) {
 		this.session = session;
+		this.messageMapper = messageMapper;
 	}
 
 	@Override
@@ -28,5 +33,16 @@ public class CassandraMessageDao implements MessageDao {
 				.and(eq("template_id", templateId));
 
 		session.execute(statement);
+	}
+
+	@Override
+	public Result<Message> getAllForCampaignNameAndTemplateId(String campaignName, String templateId) {
+		Statement statement = QueryBuilder.select()
+				.all()
+				.from("gridbandit", "messages")
+				.where(eq("campaign_name", campaignName))
+				.and(eq("template_id", templateId));
+
+		return messageMapper.map(session.execute(statement));
 	}
 }

@@ -17,12 +17,16 @@ import it.gridband.campaigner.health.AliveHealthCheck;
 import it.gridband.campaigner.management.CassandraClusterManaged;
 import it.gridband.campaigner.management.CassandraSessionManaged;
 import it.gridband.campaigner.model.Campaign;
+import it.gridband.campaigner.model.Message;
 import it.gridband.campaigner.probability.ArrayIndexDistributionFactory;
 import it.gridband.campaigner.probability.WeightedArrayIndexDistributionFactoryWithUniformFallback;
 import it.gridband.campaigner.resources.CampaignResource;
 import it.gridband.campaigner.resources.TemplateResource;
 import it.gridband.campaigner.resources.WebhookResource;
+import it.gridband.campaigner.score.AverageScoreTemplateIdWeightCalculatorFactory;
+import it.gridband.campaigner.score.BasicPostfixFormulaFactory;
 import it.gridband.campaigner.score.ExistingScoreExtractor;
+import it.gridband.campaigner.score.PostOpenOverwritingMessageEventSummarizer;
 import it.gridband.campaigner.select.ActiveTemplateIdSelector;
 import it.gridband.campaigner.select.DistributionBasedActiveTemplateIdSelector;
 
@@ -55,8 +59,7 @@ public class CampaignerApplication extends Application<CampaignerConfiguration> 
 
 		MappingManager mappingManager = new MappingManager(session);
 		final CampaignDao campaignDao = new CassandraCampaignDao(session, mappingManager.mapper(Campaign.class));
-
-		final MessageDao messageDao = new CassandraMessageDao(session);
+		final MessageDao messageDao = new CassandraMessageDao(session, mappingManager.mapper(Message.class));
 
 		startProbabilityUpdater(environment, messageDao, campaignDao);
 
@@ -98,7 +101,9 @@ public class CampaignerApplication extends Application<CampaignerConfiguration> 
 		String probabilityUpdaterThreadNameFormat = "probability-updater-%d";
 		ScheduledExecutorService probabilityUpdaterExecutorService =
 				environment.lifecycle().scheduledExecutorService(probabilityUpdaterThreadNameFormat).build();
-		Runnable probabilityUpdater = new ProbabilityUpdater(messageDao, campaignDao);
+		Runnable probabilityUpdater = new ProbabilityUpdater(
+				messageDao, campaignDao, new BasicPostfixFormulaFactory(),
+				new AverageScoreTemplateIdWeightCalculatorFactory(), new PostOpenOverwritingMessageEventSummarizer());
 		probabilityUpdaterExecutorService.scheduleWithFixedDelay(probabilityUpdater, 0, 15, TimeUnit.SECONDS);
 	}
 }

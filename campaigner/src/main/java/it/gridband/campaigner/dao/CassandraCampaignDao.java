@@ -18,8 +18,8 @@ import static com.datastax.driver.core.querybuilder.QueryBuilder.*;
 
 public class CassandraCampaignDao implements CampaignDao {
 
-	private Mapper<Campaign> campaignMapper;
 	private Session session;
+	private Mapper<Campaign> campaignMapper;
 
 	public CassandraCampaignDao(Session session, Mapper<Campaign> campaignMapper) {
 		this.session = session;

@@ -7,7 +7,6 @@ import com.datastax.driver.mapping.annotations.Table;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Table(keyspace = "gridbandit", name = "messages")
@@ -35,9 +34,6 @@ public class Message {
 	@Column(name = "event_timestamp_mse_colon_metric_to_value")
 	private Map<String, Double> eventTimestampMseColonMetricToValue;
 
-	public Message() {
-		eventTimestampMseColonMetricToValue = new HashMap<String, Double>();
-	}
 
 	public String getCampaignName() {
 		return campaignName;

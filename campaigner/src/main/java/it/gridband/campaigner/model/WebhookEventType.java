@@ -7,7 +7,7 @@ public enum WebhookEventType {
 	DELIVERED("delivered"),
 	OPEN("open"),
 	CLICK("click"),
-	SPAM_REPORT("spamreport"),
+	SPAMREPORT("spamreport"),
 	UNSUBSCRIBE("unsubscribe");
 
 	private String sendgridApiKey;
