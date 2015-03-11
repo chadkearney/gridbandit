@@ -23,12 +23,13 @@ import it.gridband.campaigner.probability.WeightedArrayIndexDistributionFactoryW
 import it.gridband.campaigner.resources.CampaignResource;
 import it.gridband.campaigner.resources.TemplateResource;
 import it.gridband.campaigner.resources.WebhookResource;
-import it.gridband.campaigner.score.AverageScoreTemplateIdWeightCalculatorFactory;
 import it.gridband.campaigner.score.BasicPostfixFormulaFactory;
 import it.gridband.campaigner.score.ExistingScoreExtractor;
+import it.gridband.campaigner.score.PartialPoolingTemplateIdWeightCalculatorFactory;
 import it.gridband.campaigner.score.PostOpenOverwritingMessageEventSummarizer;
 import it.gridband.campaigner.select.ActiveTemplateIdSelector;
 import it.gridband.campaigner.select.DistributionBasedActiveTemplateIdSelector;
+import it.gridband.campaigner.select.MaxElementRandomTiebreakDoubleArrayIndexSelectorFactory;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -103,7 +104,10 @@ public class CampaignerApplication extends Application<CampaignerConfiguration> 
 				environment.lifecycle().scheduledExecutorService(probabilityUpdaterThreadNameFormat).build();
 		Runnable probabilityUpdater = new ProbabilityUpdater(
 				messageDao, campaignDao, new BasicPostfixFormulaFactory(),
-				new AverageScoreTemplateIdWeightCalculatorFactory(), new PostOpenOverwritingMessageEventSummarizer());
+				new PartialPoolingTemplateIdWeightCalculatorFactory(5000, 10000,
+						new MaxElementRandomTiebreakDoubleArrayIndexSelectorFactory()
+				),
+				new PostOpenOverwritingMessageEventSummarizer());
 		probabilityUpdaterExecutorService.scheduleWithFixedDelay(probabilityUpdater, 0, 15, TimeUnit.SECONDS);
 	}
 }

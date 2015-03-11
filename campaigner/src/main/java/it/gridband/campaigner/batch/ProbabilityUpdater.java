@@ -21,7 +21,7 @@ public class ProbabilityUpdater implements Runnable {
 	private TemplateIdWeightCalculatorFactory templateIdWeightCalculatorFactory;
 	private MessageEventSummarizer messageEventSummarizer;
 
-	final static Logger logger = LoggerFactory.getLogger(ProbabilityUpdater.class);
+	private final static Logger logger = LoggerFactory.getLogger(ProbabilityUpdater.class);
 
 	public ProbabilityUpdater(MessageDao messageDao, CampaignDao campaignDao, PostfixFormulaFactory postfixFormulaFactory, TemplateIdWeightCalculatorFactory templateIdWeightCalculatorFactory, MessageEventSummarizer messageEventSummarizer) {
 		this.messageDao = messageDao;
@@ -74,6 +74,6 @@ public class ProbabilityUpdater implements Runnable {
 			}
 		}
 
-		return Optional.of(templateIdWeightCalculator.generateWeights());
+		return Optional.of(templateIdWeightCalculator.generateWeights(activeTemplateIds));
 	}
 }
