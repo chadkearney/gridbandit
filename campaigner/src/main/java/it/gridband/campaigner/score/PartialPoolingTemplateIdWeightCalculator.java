@@ -79,10 +79,7 @@ public class PartialPoolingTemplateIdWeightCalculator implements TemplateIdWeigh
 		}
 
 		sampler.prepareForWalk();
-
-		for (int i = 0; i < burnInIterations; i++) {
-			sampler.step();
-		}
+		burnInSampler(sampler);
 
 		double[] numberOfTimesTemplateIdWasSelected = new double[targetTemplateIds.size()];
 		double[] nextMeanEstimates = new double[targetTemplateIds.size()];
@@ -90,24 +87,31 @@ public class PartialPoolingTemplateIdWeightCalculator implements TemplateIdWeigh
 
 		for (int i = 0; i < scoringIterations; i++) {
 			sampler.step();
-
-			System.arraycopy(sampler.getCurrentEstimatedGroupMeans(), 0,
-					nextMeanEstimates, 0, targetTemplateIdsWithObservations.size());
-
-			if (targetTemplateIdsWithoutObservations.size() > 0) {
-				NormalDistribution normalDistribution =
-						new NormalDistribution(randomGenerator,
-								sampler.getCurrentEstimatedGroupOverallMean(),
-								sampler.getCurrentEstimatedBetweenGroupStdDev());
-
-				System.arraycopy(normalDistribution.sample(targetTemplateIdsWithoutObservations.size()), 0,
-						nextMeanEstimates, targetTemplateIdsWithObservations.size(), targetTemplateIdsWithoutObservations.size());
-			}
-
+			copyNextEstimates(nextMeanEstimates, sampler, targetTemplateIdsWithObservations.size(), targetTemplateIdsWithoutObservations.size());
 			numberOfTimesTemplateIdWasSelected[selector.select(nextMeanEstimates)] += 1;
 		}
 
 		return generateNewWeightMapFromSelectionCounts(targetTemplateIdsWithObservations, targetTemplateIdsWithoutObservations, numberOfTimesTemplateIdWasSelected);
+	}
+
+	private void burnInSampler(PartialPoolingNoPredictorGibbsSampler sampler) {
+		for (int i = 0; i < burnInIterations; i++) {
+			sampler.step();
+		}
+	}
+
+	private void copyNextEstimates(double[] dest, PartialPoolingNoPredictorGibbsSampler sampler, int directlyEstimatedMeanCount, int simulatedMeanCount) {
+		System.arraycopy(sampler.getCurrentEstimatedGroupMeans(), 0, dest, 0, directlyEstimatedMeanCount);
+
+		if (simulatedMeanCount > 0) {
+			NormalDistribution normalDistribution =
+					new NormalDistribution(randomGenerator,
+							sampler.getCurrentEstimatedGroupOverallMean(),
+							sampler.getCurrentEstimatedBetweenGroupStdDev());
+
+			System.arraycopy(normalDistribution.sample(simulatedMeanCount), 0, dest,
+					directlyEstimatedMeanCount, simulatedMeanCount);
+		}
 	}
 
 	private Map<String, Double> identityMap(Set<String> targetTemplateIds) {
@@ -120,9 +124,11 @@ public class PartialPoolingTemplateIdWeightCalculator implements TemplateIdWeigh
 
 	private Map<String, Double> generateNewWeightMapFromSelectionCounts(ArrayList<String> targetTemplateIdsWithObservations, ArrayList<String> targetTemplateIdsWithoutObservations, double[] numberOfTimesTemplateIdWasSelected) {
 		Map<String, Double> newWeights = Maps.newHashMap();
+
 		for (int i = 0; i < targetTemplateIdsWithObservations.size(); i++) {
 			newWeights.put(targetTemplateIdsWithObservations.get(i), numberOfTimesTemplateIdWasSelected[i]);
 		}
+
 		for (int i = 0; i < targetTemplateIdsWithoutObservations.size(); i++) {
 			newWeights.put(targetTemplateIdsWithoutObservations.get(i),
 					numberOfTimesTemplateIdWasSelected[i + targetTemplateIdsWithObservations.size()]);

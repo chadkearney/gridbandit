@@ -19,11 +19,11 @@ public interface CampaignDao {
 
 	void ensureTemplateAbsence(String campaignName, String templateId);
 
-	List<Campaign> getClaimableCampaignsWithOutOfDateTemplateProbabilities();
+	List<Campaign> getClaimableCampaignsWithOutOfDateTemplateWeights();
 
-	boolean tryClaimCampaignForTemplateProbabilityUpdate(Campaign campaign);
+	boolean tryClaimCampaignForTemplateWeightUpdate(Campaign campaign);
 
-	void updateTemplateProbabilities(String campaignName, Map<String, Double> templateIdToProbability, long changeUpperBoundMse);
+	void updateTemplateWeights(String campaignName, Map<String, Double> templateIdToWeight, long changeUpperBoundMse);
 
 	void updateHeartbeatToPresent(String campaignName);
 }

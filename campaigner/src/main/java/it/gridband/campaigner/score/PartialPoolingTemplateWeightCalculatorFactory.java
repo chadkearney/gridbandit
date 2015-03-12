@@ -2,13 +2,13 @@ package it.gridband.campaigner.score;
 
 import it.gridband.campaigner.select.DoubleArrayIndexSelectorFactory;
 
-public class PartialPoolingTemplateIdWeightCalculatorFactory implements TemplateIdWeightCalculatorFactory {
+public class PartialPoolingTemplateWeightCalculatorFactory implements TemplateWeightCalculatorFactory {
 
 	private int burnInIterations;
 	private int scoringIterations;
 	private DoubleArrayIndexSelectorFactory doubleArrayIndexSelectorFactory;
 
-	public PartialPoolingTemplateIdWeightCalculatorFactory(int burnInIterations, int scoringIterations, DoubleArrayIndexSelectorFactory doubleArrayIndexSelectorFactory) {
+	public PartialPoolingTemplateWeightCalculatorFactory(int burnInIterations, int scoringIterations, DoubleArrayIndexSelectorFactory doubleArrayIndexSelectorFactory) {
 		this.burnInIterations = burnInIterations;
 		this.scoringIterations = scoringIterations;
 		this.doubleArrayIndexSelectorFactory = doubleArrayIndexSelectorFactory;

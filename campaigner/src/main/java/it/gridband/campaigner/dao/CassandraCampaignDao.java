@@ -79,42 +79,42 @@ public class CassandraCampaignDao implements CampaignDao {
 	}
 
 	@Override
-	public List<Campaign> getClaimableCampaignsWithOutOfDateTemplateProbabilities() {
+	public List<Campaign> getClaimableCampaignsWithOutOfDateTemplateWeights() {
 		Select statement = QueryBuilder.select()
 				.all()
 				.from("gridbandit", "campaigns");
 		Result<Campaign> campaigns = campaignMapper.map(session.execute(statement));
 
-		List<Campaign> campaignsWithOutOfDateTemplateProbabilities = new ArrayList<>();
+		List<Campaign> campaignsWithOutOfDateTemplateWeights = new ArrayList<>();
 		for (Campaign campaign : campaigns) {
 			if (heartbeatHasNotBeenUpdatedInLastGivenMillis(campaign, 60 * 1000) &&
-					templateProbabilitiesAreMissingMoreRecentChanges(campaign))
+					templateWeightsAreMissingMoreRecentChanges(campaign))
 			{
-				campaignsWithOutOfDateTemplateProbabilities.add(campaign);
+				campaignsWithOutOfDateTemplateWeights.add(campaign);
 			}
 		}
 
-		return campaignsWithOutOfDateTemplateProbabilities;
+		return campaignsWithOutOfDateTemplateWeights;
 	}
 
 	@Override
-	public boolean tryClaimCampaignForTemplateProbabilityUpdate(Campaign campaign) {
+	public boolean tryClaimCampaignForTemplateWeightUpdate(Campaign campaign) {
 		Statement statement = QueryBuilder
 				.update("gridbandit", "campaigns")
-				.with(set("template_probabilities_update_heartbeat_mse", System.currentTimeMillis()))
+				.with(set("template_weights_update_heartbeat_mse", System.currentTimeMillis()))
 				.where(eq("name", campaign.getName()))
-				.onlyIf(eq("template_probabilities_update_heartbeat_mse", campaign.getTemplateProbabilitiesUpdateHeartbeatMse()));
+				.onlyIf(eq("template_weights_update_heartbeat_mse", campaign.getTemplateWeightsUpdateHeartbeatMse()));
 		ResultSet resultSet = session.execute(statement);
 
 		return resultSet.one().getBool("[applied]");
 	}
 
 	@Override
-	public void updateTemplateProbabilities(String campaignName, Map<String, Double> templateIdToProbability, long changeUpperBoundMse) {
+	public void updateTemplateWeights(String campaignName, Map<String, Double> templateIdToWeight, long changeUpperBoundMse) {
 		Statement statement = QueryBuilder
 				.update("gridbandit", "campaigns")
-				.with(set("template_id_to_probability", templateIdToProbability))
-				.and(set("template_probabilities_include_changes_up_to_mse", changeUpperBoundMse))
+				.with(set("template_id_to_weight", templateIdToWeight))
+				.and(set("template_weights_include_changes_up_to_mse", changeUpperBoundMse))
 				.where(eq("name", campaignName));
 		session.execute(statement);
 	}
@@ -123,26 +123,26 @@ public class CassandraCampaignDao implements CampaignDao {
 	public void updateHeartbeatToPresent(String campaignName) {
 		Statement statement = QueryBuilder
 				.update("gridbandit", "campaigns")
-				.with(set("template_probabilities_update_heartbeat_mse", System.currentTimeMillis()))
+				.with(set("template_weights_update_heartbeat_mse", System.currentTimeMillis()))
 				.where(eq("name", campaignName));
 		session.execute(statement);
 	}
 
 	private boolean heartbeatHasNotBeenUpdatedInLastGivenMillis(Campaign campaign, long givenMillis) {
-		return campaign.getTemplateProbabilitiesUpdateHeartbeatMse() == null ||
-				System.currentTimeMillis() - campaign.getTemplateProbabilitiesUpdateHeartbeatMse() > givenMillis;
+		return campaign.getTemplateWeightsUpdateHeartbeatMse() == null ||
+				System.currentTimeMillis() - campaign.getTemplateWeightsUpdateHeartbeatMse() > givenMillis;
 	}
 
-	private boolean templateProbabilitiesAreMissingMoreRecentChanges(Campaign campaign) {
+	private boolean templateWeightsAreMissingMoreRecentChanges(Campaign campaign) {
 		if (campaign.getLastPotentiallyScoreAlteringChangeMse() == null) {
 			return false;
 		}
 
-		if (campaign.getTemplateProbabilitiesIncludeChangesUpToMse() == null) {
+		if (campaign.getTemplateWeightsIncludeChangesUpToMse() == null) {
 			return true;
 		}
 
-		return campaign.getTemplateProbabilitiesIncludeChangesUpToMse() < campaign.getLastPotentiallyScoreAlteringChangeMse();
+		return campaign.getTemplateWeightsIncludeChangesUpToMse() < campaign.getLastPotentiallyScoreAlteringChangeMse();
 	}
 
 }

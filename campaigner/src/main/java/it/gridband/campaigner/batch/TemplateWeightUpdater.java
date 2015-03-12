@@ -13,56 +13,56 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ProbabilityUpdater implements Runnable {
+public class TemplateWeightUpdater implements Runnable {
 
 	private MessageDao messageDao;
 	private CampaignDao campaignDao;
 	private PostfixFormulaFactory postfixFormulaFactory;
-	private TemplateIdWeightCalculatorFactory templateIdWeightCalculatorFactory;
+	private TemplateWeightCalculatorFactory templateWeightCalculatorFactory;
 	private MessageEventSummarizer messageEventSummarizer;
 
-	private final static Logger logger = LoggerFactory.getLogger(ProbabilityUpdater.class);
+	private final static Logger logger = LoggerFactory.getLogger(TemplateWeightUpdater.class);
 
-	public ProbabilityUpdater(MessageDao messageDao, CampaignDao campaignDao, PostfixFormulaFactory postfixFormulaFactory, TemplateIdWeightCalculatorFactory templateIdWeightCalculatorFactory, MessageEventSummarizer messageEventSummarizer) {
+	public TemplateWeightUpdater(MessageDao messageDao, CampaignDao campaignDao, PostfixFormulaFactory postfixFormulaFactory, TemplateWeightCalculatorFactory templateWeightCalculatorFactory, MessageEventSummarizer messageEventSummarizer) {
 		this.messageDao = messageDao;
 		this.campaignDao = campaignDao;
 		this.postfixFormulaFactory = postfixFormulaFactory;
-		this.templateIdWeightCalculatorFactory = templateIdWeightCalculatorFactory;
+		this.templateWeightCalculatorFactory = templateWeightCalculatorFactory;
 		this.messageEventSummarizer = messageEventSummarizer;
 	}
 
 	@Override
 	public void run() {
-		logger.info("ProbabilityUpdater waking up.");
+		logger.info("TemplateWeightUpdater waking up.");
 
-		List<Campaign> updatableCampaigns = campaignDao.getClaimableCampaignsWithOutOfDateTemplateProbabilities();
+		List<Campaign> updatableCampaigns = campaignDao.getClaimableCampaignsWithOutOfDateTemplateWeights();
 
 		for (Campaign campaign : updatableCampaigns) {
-			if (campaignDao.tryClaimCampaignForTemplateProbabilityUpdate(campaign)) {
-				logger.info("ProbabilityUpdater claimed campaign " + campaign.getName() + "; updating.");
+			if (campaignDao.tryClaimCampaignForTemplateWeightUpdate(campaign)) {
+				logger.info("TemplateWeightUpdater claimed campaign " + campaign.getName() + "; updating.");
 
 				long upperBoundChangeTimestamps = System.currentTimeMillis();
 
-				Optional<Map<String, Double>> newProbabilities = generateNewProbabilitiesForCampaign(campaign);
-				if (!newProbabilities.isPresent()) {
-					logger.error("ProbabilityUpdater failed to generate new probabilities for campaign " + campaign.getName() + "; task will be retried.");
+				Optional<Map<String, Double>> newWeights = generateNewWeightsForCampaign(campaign);
+				if (!newWeights.isPresent()) {
+					logger.error("TemplateWeightUpdater failed to generate new weights for campaign " + campaign.getName() + "; task will be retried.");
 					continue;
 				}
 
-				campaignDao.updateTemplateProbabilities(campaign.getName(), newProbabilities.get(), upperBoundChangeTimestamps);
+				campaignDao.updateTemplateWeights(campaign.getName(), newWeights.get(), upperBoundChangeTimestamps);
 			}
 		}
 
-		logger.info("ProbabilityUpdater complete.");
+		logger.info("TemplateWeightUpdater complete.");
 	}
 
-	private Optional<Map<String, Double>> generateNewProbabilitiesForCampaign(Campaign campaign) {
+	private Optional<Map<String, Double>> generateNewWeightsForCampaign(Campaign campaign) {
 		Set<String> activeTemplateIds = campaign.getActiveTemplateIds();
 		if (activeTemplateIds == null || activeTemplateIds.isEmpty()) {
 			return Optional.absent();
 		}
 
-		TemplateIdWeightCalculator templateIdWeightCalculator = templateIdWeightCalculatorFactory.build();
+		TemplateIdWeightCalculator templateIdWeightCalculator = templateWeightCalculatorFactory.build();
 		PostfixFormula formula = postfixFormulaFactory.build(campaign.getScoringFormula());
 
 		for (String activeTemplateId : activeTemplateIds) {

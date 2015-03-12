@@ -4,11 +4,11 @@ USE gridbandit;
   CREATE TABLE campaigns (
     name text,
     active_template_ids set<text>,
-    template_id_to_probability map<text, double>,
+    template_id_to_weight map<text, double>,
     scoring_formula text,
     last_potentially_score_altering_change_mse bigint,
-    template_probabilities_include_changes_up_to_mse bigint,
-    template_probabilities_update_heartbeat_mse bigint,
+    template_weights_include_changes_up_to_mse bigint,
+    template_weights_update_heartbeat_mse bigint,
     PRIMARY KEY (name)
   );
 

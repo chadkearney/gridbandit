@@ -1,5 +1,5 @@
 package it.gridband.campaigner.score;
 
-public interface TemplateIdWeightCalculatorFactory {
+public interface TemplateWeightCalculatorFactory {
 	TemplateIdWeightCalculator build();
 }

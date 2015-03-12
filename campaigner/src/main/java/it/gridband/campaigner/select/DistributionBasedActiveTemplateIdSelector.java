@@ -24,7 +24,7 @@ public class DistributionBasedActiveTemplateIdSelector implements ActiveTemplate
 		}
 
 		ImmutableList<String> activeTemplateIds = new ImmutableList.Builder<String>().addAll(campaign.getActiveTemplateIds()).build();
-		ImmutableList<Double> activeTemplateIdScores = existingScoreExtractor.extractScoresForKeys(activeTemplateIds, Optional.fromNullable(campaign.getTemplateIdToProbability()));
+		ImmutableList<Double> activeTemplateIdScores = existingScoreExtractor.extractScoresForKeys(activeTemplateIds, Optional.fromNullable(campaign.getTemplateIdToWeight()));
 
 		Optional<ArrayIndexDistribution> distribution = arrayIndexDistributionFactory.build(activeTemplateIdScores);
 

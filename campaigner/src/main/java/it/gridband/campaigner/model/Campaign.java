@@ -24,8 +24,8 @@ public class Campaign {
 	@Column(name = "active_template_ids")
 	private Set<String> activeTemplateIds;
 
-	@Column(name = "template_id_to_probability")
-	private Map<String, Double> templateIdToProbability;
+	@Column(name = "template_id_to_weight")
+	private Map<String, Double> templateIdToWeight;
 
 	@NotNull
 	@Length(max = 1024)
@@ -35,11 +35,11 @@ public class Campaign {
 	@Column(name = "last_potentially_score_altering_change_mse")
 	private Long lastPotentiallyScoreAlteringChangeMse;
 
-	@Column(name = "template_probabilities_include_changes_up_to_mse")
-	private Long templateProbabilitiesIncludeChangesUpToMse;
+	@Column(name = "template_weights_include_changes_up_to_mse")
+	private Long templateWeightsIncludeChangesUpToMse;
 
-	@Column(name = "template_probabilities_update_heartbeat_mse")
-	private Long templateProbabilitiesUpdateHeartbeatMse;
+	@Column(name = "template_weights_update_heartbeat_mse")
+	private Long templateWeightsUpdateHeartbeatMse;
 
 
 	@JsonProperty
@@ -75,26 +75,26 @@ public class Campaign {
 	}
 
 	@JsonProperty
-	public Map<String, Double> getTemplateIdToProbability() {
-		return templateIdToProbability;
+	public Map<String, Double> getTemplateIdToWeight() {
+		return templateIdToWeight;
 	}
-	public void setTemplateIdToProbability(Map<String, Double> templateIdToProbability) {
-		this.templateIdToProbability = templateIdToProbability;
+	public void setTemplateIdToWeight(Map<String, Double> templateIdToWeight) {
+		this.templateIdToWeight = templateIdToWeight;
 	}
 
 	@JsonProperty
-	public Long getTemplateProbabilitiesIncludeChangesUpToMse() {
-		return templateProbabilitiesIncludeChangesUpToMse;
+	public Long getTemplateWeightsIncludeChangesUpToMse() {
+		return templateWeightsIncludeChangesUpToMse;
 	}
-	public void setTemplateProbabilitiesIncludeChangesUpToMse(Long templateProbabilitiesIncludeChangesUpToMse) {
-		this.templateProbabilitiesIncludeChangesUpToMse = templateProbabilitiesIncludeChangesUpToMse;
+	public void setTemplateWeightsIncludeChangesUpToMse(Long templateWeightsIncludeChangesUpToMse) {
+		this.templateWeightsIncludeChangesUpToMse = templateWeightsIncludeChangesUpToMse;
 	}
 
 	@JsonIgnore
-	public Long getTemplateProbabilitiesUpdateHeartbeatMse() {
-		return templateProbabilitiesUpdateHeartbeatMse;
+	public Long getTemplateWeightsUpdateHeartbeatMse() {
+		return templateWeightsUpdateHeartbeatMse;
 	}
-	public void setTemplateProbabilitiesUpdateHeartbeatMse(Long templateProbabilitiesUpdateHeartbeatMse) {
-		this.templateProbabilitiesUpdateHeartbeatMse = templateProbabilitiesUpdateHeartbeatMse;
+	public void setTemplateWeightsUpdateHeartbeatMse(Long templateWeightsUpdateHeartbeatMse) {
+		this.templateWeightsUpdateHeartbeatMse = templateWeightsUpdateHeartbeatMse;
 	}
 }
