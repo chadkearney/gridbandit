@@ -23,7 +23,7 @@ public class CassandraMessageDao implements MessageDao {
 
 	@Override
 	public void recordEvent(String messageId, String campaignName, String templateId, long timestamp, WebhookEventType eventType) {
-		String eventTimestampMseColonMetric = timestamp + ":" + eventType.getSendgridApiKey();
+		String eventTimestampMseColonMetric = timestamp + ":" + eventType.getSendgridApiEventName();
 
 		Statement statement = QueryBuilder
 				.update("gridbandit", "messages")

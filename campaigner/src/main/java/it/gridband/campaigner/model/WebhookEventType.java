@@ -10,19 +10,19 @@ public enum WebhookEventType {
 	SPAMREPORT("spamreport"),
 	UNSUBSCRIBE("unsubscribe");
 
-	private String sendgridApiKey;
+	private String sendgridApiEventName;
 
-	WebhookEventType(String sendgridApiKey) {
-		this.sendgridApiKey = sendgridApiKey;
+	WebhookEventType(String sendgridApiEventName) {
+		this.sendgridApiEventName = sendgridApiEventName;
 	}
 
 	@JsonCreator
-	public static WebhookEventType buildFromSendgridApiKey(String sendgridApiKey) {
-		return WebhookEventType.valueOf(sendgridApiKey.toUpperCase());
+	public static WebhookEventType buildFromSendgridApiEventName(String sendgridApiEventName) {
+		return WebhookEventType.valueOf(sendgridApiEventName.toUpperCase());
 	}
 
 	@JsonValue
-	public String getSendgridApiKey() {
-		return sendgridApiKey;
+	public String getSendgridApiEventName() {
+		return sendgridApiEventName;
 	}
 }
